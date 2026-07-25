@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chunakhan Rosewater Dish | Pickleball Rankings</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Firebase SDKs for Realtime Multi-User Cloud Sync -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            court: {
+              blue: '#0d233a',
+              blueDark: '#071524',
+              blueLight: '#1e3a5f',
+              blueBorder: '#2a4d7c',
+              red: '#d92323',
+              redDark: '#991212',
+              redHover: '#ef2929',
+              gold: '#f59e0b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-card {
+      background: linear-gradient(135deg, rgba(13, 35, 58, 0.9) 0%, rgba(7, 21, 36, 0.95) 100%);
+      border: 1px solid rgba(42, 77, 124, 0.4);
+    }
+    .red-accent-border {
+      border-left: 4px solid #d92323;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-full font-sans antialiased bg-gradient-to-br from-slate-950 via-court-blueDark to-slate-950">
+
+  <!-- Header Section (70% Blue / 30% Red Accent) -->
+  <header class="bg-court-blueDark border-b border-court-blueBorder/50 sticky top-0 z-50 shadow-lg">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="bg-court-red p-2.5 rounded-xl shadow-md text-white flex items-center justify-center">
+          <i class="fa-solid fa-[#0000] fa-table-tennis-paddle-ball text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            CHUNAKHAN ROSEWATER DISH
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-court-red/20 text-court-red border border-court-red/40">Rally 21</span>
+          </h1>
+          <p class="text-xs text-blue-300/70">Official Playgroup Points & Ranking System</p>
+        </div>
+      </div>
+
+      <!-- Live Multi-User Sync Status Indicator -->
+      <div class="flex items-center gap-3">
+        <div id="syncStatusBadge" class="text-xs px-3 py-1 rounded-full bg-blue-950 text-blue-300 border border-blue-800/50 flex items-center gap-2">
+          <span id="syncDot" class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block animate-pulse"></span>
+          <span id="syncText" class="font-medium">Checking Cloud Sync...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="max-w-6xl mx-auto px-4 flex overflow-x-auto gap-1 border-t border-court-blueBorder/30 pt-1 text-sm font-medium">
+      <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="tab-btn px-4 py-2.5 rounded-t-lg transition-all border-b-2 border-court-red text-white bg-court-blueLight/40 flex items-center gap-2">
+        <i class="fa-solid fa-trophy text-amber-400"></i> Shared Leaderboard
+      </button>
+      <button onclick="switchTab('log')" id="tab-log" class="tab-btn px-4 py-2.5 rounded-t-lg transition-all border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2">
+        <i class="fa-solid fa-circle-plus text-court-red"></i> Log Match
+      </button>
+      <button onclick="switchTab('history')" id="tab-history" class="tab-btn px-4 py-2.5 rounded-t-lg transition-all border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2">
+        <i class="fa-solid fa-clock-rotate-left text-blue-400"></i> Match History
+      </button>
+      <button onclick="switchTab('stats')" id="tab-stats" class="tab-btn px-4 py-2.5 rounded-t-lg transition-all border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2">
+        <i class="fa-solid fa-chart-line text-emerald-400"></i> Stats & H2H
+      </button>
+      <button onclick="switchTab('admin')" id="tab-admin" class="tab-btn px-4 py-2.5 rounded-t-lg transition-all border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2">
+        <i class="fa-solid fa-cloud text-sky-400"></i> Live Sync Settings
+      </button>
+    </nav>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-6xl mx-auto px-4 py-6 flex-1 w-full">
+
+    <!-- 1. SHARED LEADERBOARD TAB -->
+    <section id="sec-leaderboard" class="space-y-6">
+      <!-- King of the Court Hero Card -->
+      <div id="kingHeroCard" class="glass-card rounded-2xl p-6 relative overflow-hidden shadow-2xl border-l-4 border-court-gold">
+        <div class="absolute -right-6 -bottom-6 text-slate-800/20 text-9xl font-black select-none pointer-events-none">
+          #1
+        </div>
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
+          <div class="flex items-center space-x-4">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 flex items-center justify-center text-3xl shadow-lg ring-4 ring-amber-500/30 font-black">
+              👑
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-widest text-amber-400 font-bold flex items-center gap-1">
+                <span>King of the Court</span>
+              </div>
+              <h2 id="kingName" class="text-3xl font-black text-white">---</h2>
+              <p class="text-xs text-slate-400 mt-0.5">Leading the Playgroup ATP-style Rankings</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4 text-center bg-court-blueDark/80 p-3.5 rounded-xl border border-court-blueBorder/40 w-full md:w-auto">
+            <div>
+              <span class="text-xs text-slate-400 block">Rating</span>
+              <span id="kingRating" class="text-xl font-bold text-amber-400">0</span>
+            </div>
+            <div class="border-x border-slate-700/50 px-3">
+              <span class="text-xs text-slate-400 block">Win Rate</span>
+              <span id="kingWinRate" class="text-xl font-bold text-white">0%</span>
+            </div>
+            <div>
+              <span class="text-xs text-slate-400 block">Streak</span>
+              <span id="kingStreak" class="text-xl font-bold text-emerald-400">0W</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Leaderboard Table -->
+      <div class="glass-card rounded-2xl shadow-xl overflow-hidden border border-court-blueBorder/40">
+        <div class="px-6 py-4 border-b border-court-blueBorder/40 bg-court-blueDark/50 flex justify-between items-center">
+          <h3 class="font-bold text-lg text-white flex items-center gap-2">
+            <i class="fa-solid fa-ranking-star text-court-red"></i> Live Shared Standings
+          </h3>
+          <span class="text-xs text-slate-400">Base Starting Rating: 1200</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-court-blueDark/80 text-xs text-slate-400 uppercase tracking-wider border-b border-court-blueBorder/40">
+              <tr>
+                <th class="py-3.5 px-4 text-center">Rank</th>
+                <th class="py-3.5 px-4">Player</th>
+                <th class="py-3.5 px-4 text-center">Points / Rating</th>
+                <th class="py-3.5 px-4 text-center">Matches</th>
+                <th class="py-3.5 px-4 text-center">W / L</th>
+                <th class="py-3.5 px-4 text-center">Win %</th>
+                <th class="py-3.5 px-4 text-center">Pt. Differential</th>
+                <th class="py-3.5 px-4 text-center">Current Streak</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody" class="divide-y divide-court-blueBorder/30">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. LOG MATCH TAB -->
+    <section id="sec-log" class="hidden space-y-6 max-w-2xl mx-auto">
+      <div class="glass-card p-6 rounded-2xl shadow-xl border border-court-blueBorder/40">
+        <div class="border-b border-court-blueBorder/40 pb-4 mb-6">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-pen-to-square text-court-red"></i> Record Match Result
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Rally scoring rules: played to 21 points. Both players receive point updates based on opponent rank & margin of victory.</p>
+        </div>
+
+        <form id="matchForm" onsubmit="handleMatchSubmit(event)" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Player A Selection -->
+            <div class="bg-court-blueDark/60 p-4 rounded-xl border border-court-blueBorder/40 space-y-3">
+              <label class="block text-xs font-bold uppercase tracking-wider text-blue-300">Player A</label>
+              <select id="playerA" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-court-red focus:outline-none">
+                <option value="">Select Player A</option>
+              </select>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Score</label>
+                <input type="number" id="scoreA" min="0" max="30" required placeholder="0 - 21"
+                       class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white font-mono text-center text-lg focus:ring-2 focus:ring-court-red focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Player B Selection -->
+            <div class="bg-court-blueDark/60 p-4 rounded-xl border border-court-blueBorder/40 space-y-3">
+              <label class="block text-xs font-bold uppercase tracking-wider text-blue-300">Player B</label>
+              <select id="playerB" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-court-red focus:outline-none">
+                <option value="">Select Player B</option>
+              </select>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Score</label>
+                <input type="number" id="scoreB" min="0" max="30" required placeholder="0 - 21"
+                       class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white font-mono text-center text-lg focus:ring-2 focus:ring-court-red focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-court-red hover:bg-court-redHover text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 text-base">
+            <i class="fa-solid fa-floppy-disk"></i> Submit Match & Broadcast to All Players
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 3. DETAILED MATCH HISTORY TAB -->
+    <section id="sec-history" class="hidden space-y-6">
+      <div class="glass-card rounded-2xl shadow-xl overflow-hidden border border-court-blueBorder/40">
+        <div class="px-6 py-4 border-b border-court-blueBorder/40 bg-court-blueDark/50 flex justify-between items-center">
+          <div>
+            <h3 class="font-bold text-lg text-white flex items-center gap-2">
+              <i class="fa-solid fa-history text-blue-400"></i> Match History & Detailed Points Log
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Full chronological record showing exact points gained & lost by each player per match</p>
+          </div>
+          <span id="totalMatchesCount" class="text-xs text-amber-400 font-mono font-bold bg-amber-950/50 px-2.5 py-1 rounded border border-amber-800/40">0 Matches</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-court-blueDark/80 text-xs text-slate-400 uppercase tracking-wider border-b border-court-blueBorder/40">
+              <tr>
+                <th class="py-3.5 px-4">Date & Time</th>
+                <th class="py-3.5 px-4">Winner & Points Awarded</th>
+                <th class="py-3.5 px-4">Loser & Points Deducted</th>
+                <th class="py-3.5 px-4 text-center">Score</th>
+                <th class="py-3.5 px-4 text-center">Rating Swap</th>
+                <th class="py-3.5 px-4 text-right">Delete</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody" class="divide-y divide-court-blueBorder/30">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. STATS & H2H TAB -->
+    <section id="sec-stats" class="hidden space-y-6">
+      <div class="glass-card p-6 rounded-2xl shadow-xl border border-court-blueBorder/40">
+        <h3 class="font-bold text-lg text-white mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-users-between-lines text-emerald-400"></i> Head-to-Head Record Matrix
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-center border-collapse">
+            <tbody id="h2hMatrixBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. LIVE SYNC SETTINGS & ADMIN -->
+    <section id="sec-admin" class="hidden space-y-6 max-w-3xl mx-auto">
+      <!-- Firebase Setup Card -->
+      <div class="glass-card p-6 rounded-2xl shadow-xl border border-court-blueBorder/40 space-y-4">
+        <div>
+          <h3 class="font-bold text-lg text-white flex items-center gap-2">
+            <i class="fa-solid fa-cloud text-sky-400"></i> Live Shared Database Setup (100% Free)
+          </h3>
+          <p class="text-xs text-slate-300 leading-relaxed mt-2">
+            To ensure <strong>Ankur, Alok, and Sumit</strong> all see the exact same live leaderboard on their own phones simultaneously, paste your free Firebase Firestore config JSON below. 
+          </p>
+        </div>
+
+        <textarea id="firebaseConfigInput" rows="4" placeholder='{"apiKey": "...", "authDomain": "...", "projectId": "...", "storageBucket": "...", "messagingSenderId": "...", "appId": "..."}'
+                  class="w-full font-mono text-xs bg-slate-900 border border-slate-700 rounded-lg p-3 text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+
+        <div class="flex gap-3">
+          <button onclick="saveFirebaseConfig()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2 rounded-lg text-sm">
+            Connect Shared Cloud DB
+          </button>
+          <button onclick="clearFirebaseConfig()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-2 rounded-lg text-sm">
+            Use Local Storage Only
+          </button>
+        </div>
+      </div>
+
+      <!-- Add Player Card -->
+      <div class="glass-card p-6 rounded-2xl shadow-xl border border-court-blueBorder/40">
+        <h3 class="font-bold text-lg text-white mb-2 flex items-center gap-2">
+          <i class="fa-solid fa-user-plus text-court-red"></i> Add New Player
+        </h3>
+        <p class="text-xs text-slate-400 mb-4">New players enter the league with a baseline starting rating of 1200.</p>
+        <form onsubmit="handleAddPlayer(event)" class="flex gap-3">
+          <input type="text" id="newPlayerName" placeholder="Player Name" required
+                 class="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-court-red focus:outline-none">
+          <button type="submit" class="bg-court-red hover:bg-court-redHover px-5 py-2.5 rounded-lg text-white font-bold text-sm">
+            Add Player
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-court-blueDark border-t border-court-blueBorder/30 py-4 text-center text-xs text-slate-500">
+    Chunakhan Rosewater Dish &copy; Rally Scoring Points Engine
+  </footer>
+
+  <!-- CORE LOGIC AND CALCULATION SCRIPT -->
+  <script>
+    const BASE_RATING = 1200;
+    
+    // Default 3 initial players
+    const DEFAULT_PLAYERS = [
+      { id: 'p_ankur', name: 'Ankur', rating: BASE_RATING, matches: 0, wins: 0, losses: 0, ptsFor: 0, ptsAgainst: 0, streak: 0, maxStreak: 0, peakRating: BASE_RATING },
+      { id: 'p_alok',  name: 'Alok',  rating: BASE_RATING, matches: 0, wins: 0, losses: 0, ptsFor: 0, ptsAgainst: 0, streak: 0, maxStreak: 0, peakRating: BASE_RATING },
+      { id: 'p_sumit', name: 'Sumit', rating: BASE_RATING, matches: 0, wins: 0, losses: 0, ptsFor: 0, ptsAgainst: 0, streak: 0, maxStreak: 0, peakRating: BASE_RATING }
+    ];
+
+    let state = {
+      players: JSON.parse(localStorage.getItem('crd_players')) || DEFAULT_PLAYERS,
+      matches: JSON.parse(localStorage.getItem('crd_matches')) || [],
+      firebaseConfig: JSON.parse(localStorage.getItem('crd_fb_config')) || null
+    };
+
+    let db = null;
+
+    // --- RALLY-MARGIN ADJUSTED RATING FORMULA ---
+    function calculateRatingDelta(winnerRating, loserRating, winnerScore, loserScore) {
+      const K = 36; // Sensitivity K-factor for small playgroups
+      
+      // Expected probability of victory based on ATP/Elo differential formula
+      const expectedWinner = 1 / (1 + Math.pow(10, (loserRating - winnerRating) / 400));
+      
+      // Point Differential Margin Multiplier (Logarithmic scale)
+      const pointMargin = Math.max(1, winnerScore - loserScore);
+      const marginMultiplier = Math.log(pointMargin + 1) * (2.2 / ((winnerRating - loserRating) * 0.001 + 2.2));
+      
+      let delta = Math.round(K * marginMultiplier * (1 - expectedWinner));
+      return Math.max(3, delta); // Ensure minimum +3 pts awarded for winning a rally match
+    }
+
+    // --- RE-CALCULATE ENTIRE LEAGUE STATS ---
+    function recalculateAllRatings() {
+      // Reset player stats
+      state.players.forEach(p => {
+        p.rating = BASE_RATING;
+        p.matches = 0;
+        p.wins = 0;
+        p.losses = 0;
+        p.ptsFor = 0;
+        p.ptsAgainst = 0;
+        p.streak = 0;
+        p.maxStreak = 0;
+        p.peakRating = BASE_RATING;
+      });
+
+      // Sort chronological order
+      state.matches.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+      // Process match logs
+      state.matches.forEach(m => {
+        const winner = state.players.find(p => p.id === m.winnerId);
+        const loser = state.players.find(p => p.id === m.loserId);
+
+        if (!winner || !loser) return;
+
+        const delta = calculateRatingDelta(winner.rating, loser.rating, m.winnerScore, m.loserScore);
+
+        // Store exact rating transitions for the log view
+        m.winnerRatingBefore = winner.rating;
+        m.loserRatingBefore = loser.rating;
+        
+        winner.rating += delta;
+        loser.rating -= delta;
+
+        m.winnerRatingAfter = winner.rating;
+        m.loserRatingAfter = loser.rating;
+        m.delta = delta; // Exact points exchanged
+
+        // Update Cumulative Stats
+        winner.matches++; winner.wins++; winner.ptsFor += m.winnerScore; winner.ptsAgainst += m.loserScore;
+        winner.streak = winner.streak > 0 ? winner.streak + 1 : 1;
+        if (winner.streak > winner.maxStreak) winner.maxStreak = winner.streak;
+        if (winner.rating > winner.peakRating) winner.peakRating = winner.rating;
+
+        loser.matches++; loser.losses++; loser.ptsFor += m.loserScore; loser.ptsAgainst += m.winnerScore;
+        loser.streak = loser.streak < 0 ? loser.streak - 1 : -1;
+      });
+
+      saveData();
+      renderAllViews();
+    }
+
+    // --- DATA PERSISTENCE & REAL-TIME SYNC ---
+    function saveData() {
+      localStorage.setItem('crd_players', JSON.stringify(state.players));
+      localStorage.setItem('crd_matches', JSON.stringify(state.matches));
+
+      if (db) {
+        db.collection('league').doc('data').set({
+          players: state.players,
+          matches: state.matches,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(err => console.error("Cloud Sync write error:", err));
+      }
+    }
+
+    function initFirebase() {
+      if (!state.firebaseConfig) {
+        document.getElementById('syncDot').className = "w-2.5 h-2.5 rounded-full bg-slate-500 inline-block";
+        document.getElementById('syncText').innerText = "Local Mode (No Cloud Config)";
+        return;
+      }
+
+      try {
+        if (!firebase.apps.length) firebase.initializeApp(state.firebaseConfig);
+        db = firebase.firestore();
+
+        document.getElementById('syncDot').className = "w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block animate-pulse";
+        document.getElementById('syncText').innerText = "Cloud Live Synced";
+
+        // Listen for live updates from other players
+        db.collection('league').doc('data').onSnapshot(doc => {
+          if (doc.exists) {
+            const data = doc.data();
+            if (data.players) state.players = data.players;
+            if (data.matches) state.matches = data.matches;
+            renderAllViews();
+          }
+        });
+      } catch (e) {
+        console.error("Firebase setup error:", e);
+        document.getElementById('syncText').innerText = "Cloud Config Error";
+      }
+    }
+
+    // --- RENDERERS ---
+    function renderAllViews() {
+      renderLeaderboard();
+      renderLogFormSelectors();
+      renderMatchHistory();
+      renderStatsAndH2H();
+    }
+
+    function renderLeaderboard() {
+      const sorted = [...state.players].sort((a, b) => b.rating - a.rating || (b.wins/b.matches || 0) - (a.wins/a.matches || 0));
+      const tbody = document.getElementById('leaderboardBody');
+      tbody.innerHTML = '';
+
+      if (sorted.length > 0) {
+        const king = sorted[0];
+        document.getElementById('kingName').innerText = king.name;
+        document.getElementById('kingRating').innerText = king.rating;
+        const kingWR = king.matches > 0 ? Math.round((king.wins / king.matches) * 100) : 0;
+        document.getElementById('kingWinRate').innerText = `${kingWR}%`;
+        document.getElementById('kingStreak').innerText = king.streak > 0 ? `+${king.streak}W` : `${king.streak}L`;
+      }
+
+      sorted.forEach((p, idx) => {
+        const winRate = p.matches > 0 ? Math.round((p.wins / p.matches) * 100) : 0;
+        const ptDiff = p.ptsFor - p.ptsAgainst;
+        const streakBadge = p.streak > 0 ? `<span class="text-emerald-400 font-bold">+${p.streak}W</span>` : p.streak < 0 ? `<span class="text-rose-400 font-bold">${p.streak}L</span>` : `<span class="text-slate-500">-</span>`;
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-court-blueLight/30 transition border-b border-court-blueBorder/20";
+        tr.innerHTML = `
+          <td class="py-3.5 px-4 text-center font-bold ${idx === 0 ? 'text-amber-400 text-base' : 'text-slate-400'}">#${idx + 1}</td>
+          <td class="py-3.5 px-4 font-bold text-white flex items-center gap-2">
+            ${idx === 0 ? '👑 ' : ''}${p.name}
+          </td>
+          <td class="py-3.5 px-4 text-center font-mono font-bold text-amber-400 text-base">${p.rating} pts</td>
+          <td class="py-3.5 px-4 text-center">${p.matches}</td>
+          <td class="py-3.5 px-4 text-center text-xs font-mono">${p.wins} - ${p.losses}</td>
+          <td class="py-3.5 px-4 text-center font-semibold">${winRate}%</td>
+          <td class="py-3.5 px-4 text-center font-mono text-xs ${ptDiff >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${ptDiff >= 0 ? '+' : ''}${ptDiff}</td>
+          <td class="py-3.5 px-4 text-center text-xs">${streakBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderLogFormSelectors() {
+      const pA = document.getElementById('playerA');
+      const pB = document.getElementById('playerB');
+
+      const valA = pA.value;
+      const valB = pB.value;
+
+      pA.innerHTML = '<option value="">Select Player A</option>';
+      pB.innerHTML = '<option value="">Select Player B</option>';
+
+      state.players.forEach(p => {
+        pA.innerHTML += `<option value="${p.id}">${p.name} (${p.rating} pts)</option>`;
+        pB.innerHTML += `<option value="${p.id}">${p.name} (${p.rating} pts)</option>`;
+      });
+
+      pA.value = valA;
+      pB.value = valB;
+    }
+
+    // --- MATCH HISTORY WITH EXACT DATES AND PLAYER-LEVEL DELTAS ---
+    function renderMatchHistory() {
+      const tbody = document.getElementById('historyTableBody');
+      tbody.innerHTML = '';
+
+      document.getElementById('totalMatchesCount').innerText = `${state.matches.length} Matches Played`;
+
+      const recent = [...state.matches].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      recent.forEach(m => {
+        const winner = state.players.find(p => p.id === m.winnerId);
+        const loser = state.players.find(p => p.id === m.loserId);
+        
+        // Exact Date and Time Formatting
+        const matchDate = new Date(m.timestamp);
+        const formattedDate = matchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const formattedTime = matchDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-court-blueLight/30 border-b border-court-blueBorder/20";
+        tr.innerHTML = `
+          <td class="py-3.5 px-4 text-xs text-slate-300">
+            <div class="font-bold text-white">${formattedDate}</div>
+            <div class="text-slate-400 text-[11px]">${formattedTime}</div>
+          </td>
+          <td class="py-3.5 px-4">
+            <div class="font-bold text-emerald-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-trophy text-amber-400 text-xs"></i> ${winner ? winner.name : 'Unknown'}
+              <span class="text-xs bg-emerald-950/80 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/50">+${m.delta} pts</span>
+            </div>
+            <div class="text-[11px] text-slate-400 font-mono mt-0.5">Rating: ${m.winnerRatingBefore} → ${m.winnerRatingAfter}</div>
+          </td>
+          <td class="py-3.5 px-4">
+            <div class="font-bold text-rose-300 flex items-center gap-1.5">
+              ${loser ? loser.name : 'Unknown'}
+              <span class="text-xs bg-rose-950/80 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/50">-${m.delta} pts</span>
+            </div>
+            <div class="text-[11px] text-slate-400 font-mono mt-0.5">Rating: ${m.loserRatingBefore} → ${m.loserRatingAfter}</div>
+          </td>
+          <td class="py-3.5 px-4 text-center font-mono font-bold text-white bg-court-blueDark/60 rounded text-base">${m.winnerScore} - ${m.loserScore}</td>
+          <td class="py-3.5 px-4 text-center font-mono text-xs text-amber-400">±${m.delta} pts</td>
+          <td class="py-3.5 px-4 text-right">
+            <button onclick="deleteMatch('${m.id}')" class="text-slate-500 hover:text-rose-400 text-xs p-1 transition">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderStatsAndH2H() {
+      const body = document.getElementById('h2hMatrixBody');
+      body.innerHTML = '';
+
+      if (state.players.length === 0) return;
+
+      let headerHTML = `<tr class="border-b border-court-blueBorder/40"><th class="p-2 text-left text-xs text-slate-400">vs</th>`;
+      state.players.forEach(p => {
+        headerHTML += `<th class="p-2 font-bold text-white text-xs">${p.name}</th>`;
+      });
+      headerHTML += `</tr>`;
+      body.innerHTML += headerHTML;
+
+      state.players.forEach(pRow => {
+        let rowHTML = `<tr class="border-b border-court-blueBorder/20"><td class="p-2 text-left font-bold text-white text-xs">${pRow.name}</td>`;
+        state.players.forEach(pCol => {
+          if (pRow.id === pCol.id) {
+            rowHTML += `<td class="p-2 text-slate-600 bg-court-blueDark/40 text-xs">-</td>`;
+          } else {
+            const wins = state.matches.filter(m => m.winnerId === pRow.id && m.loserId === pCol.id).length;
+            const losses = state.matches.filter(m => m.winnerId === pCol.id && m.loserId === pRow.id).length;
+            rowHTML += `<td class="p-2 font-mono text-xs ${wins > losses ? 'text-emerald-400 font-bold' : wins < losses ? 'text-rose-400' : 'text-slate-400'}">${wins}W - ${losses}L</td>`;
+          }
+        });
+        rowHTML += `</tr>`;
+        body.innerHTML += rowHTML;
+      });
+    }
+
+    // --- ACTIONS ---
+    function handleMatchSubmit(e) {
+      e.preventDefault();
+      const pAId = document.getElementById('playerA').value;
+      const pBId = document.getElementById('playerB').value;
+      const sA = parseInt(document.getElementById('scoreA').value);
+      const sB = parseInt(document.getElementById('scoreB').value);
+
+      if (pAId === pBId) {
+        alert("Please select two different players!");
+        return;
+      }
+
+      if (sA < 21 && sB < 21) {
+        alert("Rally Scoring Rule: Winning score must be at least 21 points!");
+        return;
+      }
+
+      if (sA === sB) {
+        alert("Matches cannot end in a draw!");
+        return;
+      }
+
+      const winnerId = sA > sB ? pAId : pBId;
+      const loserId = sA > sB ? pBId : pAId;
+      const winnerScore = Math.max(sA, sB);
+      const loserScore = Math.min(sA, sB);
+
+      const matchObj = {
+        id: 'm_' + Date.now(),
+        timestamp: new Date().toISOString(),
+        winnerId,
+        loserId,
+        winnerScore,
+        loserScore
+      };
+
+      state.matches.push(matchObj);
+      recalculateAllRatings();
+
+      document.getElementById('scoreA').value = '';
+      document.getElementById('scoreB').value = '';
+
+      switchTab('leaderboard');
+    }
+
+    function deleteMatch(matchId) {
+      if (!confirm("Delete this match? All standings and ratings will automatically recalculate.")) return;
+      state.matches = state.matches.filter(m => m.id !== matchId);
+      recalculateAllRatings();
+    }
+
+    function handleAddPlayer(e) {
+      e.preventDefault();
+      const input = document.getElementById('newPlayerName');
+      const name = input.value.trim();
+      if (!name) return;
+
+      const newP = {
+        id: 'p_' + Date.now(),
+        name: name,
+        rating: BASE_RATING,
+        matches: 0, wins: 0, losses: 0, ptsFor: 0, ptsAgainst: 0, streak: 0, maxStreak: 0, peakRating: BASE_RATING
+      };
+
+      state.players.push(newP);
+      input.value = '';
+      recalculateAllRatings();
+      alert(`Player "${name}" added to league.`);
+    }
+
+    function saveFirebaseConfig() {
+      const val = document.getElementById('firebaseConfigInput').value.trim();
+      try {
+        const cfg = JSON.parse(val);
+        state.firebaseConfig = cfg;
+        localStorage.setItem('crd_fb_config', JSON.stringify(cfg));
+        initFirebase();
+        alert("Firebase Cloud Configuration Saved!");
+      } catch(e) {
+        alert("Invalid JSON format. Please paste valid JSON configuration.");
+      }
+    }
+
+    function clearFirebaseConfig() {
+      state.firebaseConfig = null;
+      localStorage.removeItem('crd_fb_config');
+      location.reload();
+    }
+
+    function switchTab(tabId) {
+      ['leaderboard', 'log', 'history', 'stats', 'admin'].forEach(t => {
+        document.getElementById(`sec-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-${t}`);
+        btn.classList.remove('border-court-red', 'text-white', 'bg-court-blueLight/40');
+        btn.classList.add('border-transparent', 'text-slate-400');
+      });
+
+      document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      activeBtn.classList.remove('border-transparent', 'text-slate-400');
+      activeBtn.classList.add('border-court-red', 'text-white', 'bg-court-blueLight/40');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (state.firebaseConfig) {
+        document.getElementById('firebaseConfigInput').value = JSON.stringify(state.firebaseConfig, null, 2);
+        initFirebase();
+      }
+      recalculateAllRatings();
+    });
+  </script>
+</body>
+</html>
