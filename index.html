@@ -9,112 +9,164 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f3f4f6; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #0b1a2d; /* Court Deep Blue */
+      color: #f3f4f6;
+    }
+    .court-border {
+      border: 3px solid #ffffff;
+    }
+    .kitchen-box {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.25) 0%, rgba(185, 28, 28, 0.4) 100%);
+      border: 2px dashed #ef4444;
+    }
   </style>
 </head>
-<body class="min-h-screen pb-12">
+<body class="min-h-screen pb-12 bg-slate-950 text-gray-100">
 
-  <!-- Header -->
-  <header class="border-b border-gray-800 bg-gray-900/80 backdrop-blur sticky top-0 z-50">
+  <!-- Pickleball Court Themed Header -->
+  <header class="border-b-4 border-white bg-blue-950 shadow-2xl sticky top-0 z-50">
     <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
       <div class="flex items-center gap-3">
-        <div class="bg-red-600 p-2.5 rounded-xl shadow-lg shadow-red-600/20">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <div class="bg-red-600 p-2.5 rounded-xl border-2 border-white shadow-lg">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="font-extrabold text-xl sm:text-2xl tracking-tight text-white">CHUNAKHAN ROSEWATER DISH</h1>
-            <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-bold px-2 py-0.5 rounded-full">Rally 21</span>
+            <h1 class="font-black text-xl sm:text-2xl tracking-tight text-white uppercase">Chunakhan Rosewater Dish</h1>
+            <span class="bg-red-600 text-white text-xs font-black px-2.5 py-0.5 rounded-full border border-white">Rally 21</span>
           </div>
-          <p class="text-xs text-gray-400">Official Playgroup Points & Ranking System</p>
+          <p class="text-xs text-blue-200 font-medium">Pickleball Playgroup Rating & Ranking Engine</p>
         </div>
       </div>
-      <div id="syncStatus" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 flex items-center gap-1.5">
+      <div id="syncStatus" class="text-xs font-bold px-3 py-1.5 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-400 flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span> Checking Cloud...
       </div>
     </div>
   </header>
 
   <main class="max-w-4xl mx-auto px-4 mt-6">
-    <!-- Navigation Tabs -->
-    <div class="flex gap-2 border-b border-gray-800 pb-3 mb-6 overflow-x-auto">
-      <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="tab-btn px-4 py-2 rounded-lg font-bold text-sm bg-red-600 text-white flex items-center gap-2">🏆 Leaderboard</button>
-      <button onclick="switchTab('log')" id="tab-log" class="tab-btn px-4 py-2 rounded-lg font-bold text-sm bg-gray-800/60 text-gray-400 hover:text-white flex items-center gap-2">➕ Log Match</button>
-      <button onclick="switchTab('history')" id="tab-history" class="tab-btn px-4 py-2 rounded-lg font-bold text-sm bg-gray-800/60 text-gray-400 hover:text-white flex items-center gap-2">📜 History</button>
-      <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn px-4 py-2 rounded-lg font-bold text-sm bg-gray-800/60 text-gray-400 hover:text-white flex items-center gap-2">☁️ Live Sync</button>
+
+    <!-- Court Line Navigation Tabs -->
+    <div class="flex gap-2 border-b-2 border-blue-800 pb-3 mb-6 overflow-x-auto">
+      <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="tab-btn px-4 py-2 rounded-xl font-extrabold text-sm bg-blue-600 text-white border border-white shadow flex items-center gap-2">🏆 Leaderboard</button>
+      <button onclick="switchTab('log')" id="tab-log" class="tab-btn px-4 py-2 rounded-xl font-extrabold text-sm bg-blue-900/60 text-blue-200 border border-blue-700/50 flex items-center gap-2">🏓 Log Match</button>
+      <button onclick="switchTab('stats')" id="tab-stats" class="tab-btn px-4 py-2 rounded-xl font-extrabold text-sm bg-blue-900/60 text-blue-200 border border-blue-700/50 flex items-center gap-2">📊 Stats & H2H</button>
+      <button onclick="switchTab('history')" id="tab-history" class="tab-btn px-4 py-2 rounded-xl font-extrabold text-sm bg-blue-900/60 text-blue-200 border border-blue-700/50 flex items-center gap-2">📜 History</button>
+      <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn px-4 py-2 rounded-xl font-extrabold text-sm bg-blue-900/60 text-blue-200 border border-blue-700/50 flex items-center gap-2">☁️ Live Sync</button>
     </div>
 
-    <!-- LEADERBOARD TAB -->
-    <div id="view-leaderboard" class="tab-content space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" id="topPodium"></div>
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
+    <!-- 1. LEADERBOARD TAB -->
+    <div id="view-leaderboard" class="tab-content space-y-5">
+      <!-- Podium -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="topPodium"></div>
+
+      <!-- Kitchen Highlight Banner -->
+      <div class="kitchen-box p-4 rounded-2xl text-center space-y-1">
+        <span class="text-xs font-black uppercase text-red-300 tracking-wider">The Kitchen Rule (Expectation Logic)</span>
+        <p class="text-xs text-red-100">Points are earned based on <strong>performance vs expectations</strong>! Scoring close against a top player gains you points even in a loss. Winning narrowly against an underdog drops rating.</p>
+      </div>
+
+      <div class="bg-blue-950 border-2 border-blue-800 rounded-2xl overflow-hidden shadow-2xl">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-gray-800/50 text-gray-400 text-xs uppercase tracking-wider border-b border-gray-800">
+            <tr class="bg-blue-900/80 text-blue-200 text-xs font-black uppercase tracking-wider border-b border-blue-800">
               <th class="p-4">Rank</th>
               <th class="p-4">Player</th>
-              <th class="p-4 text-center">Pts</th>
+              <th class="p-4 text-center">Rating</th>
               <th class="p-4 text-center">W / L</th>
-              <th class="p-4 text-center">Win %</th>
+              <th class="p-4 text-center">Pts Won / Lost</th>
             </tr>
           </thead>
-          <tbody id="leaderboardBody" class="divide-y divide-gray-800/60 text-sm font-medium"></tbody>
+          <tbody id="leaderboardBody" class="divide-y divide-blue-900/60 text-sm font-semibold"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- LOG MATCH TAB -->
+    <!-- 2. LOG MATCH TAB -->
     <div id="view-log" class="tab-content hidden max-w-xl mx-auto">
-      <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl shadow-xl space-y-5">
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">🏓 Log Match Result</h2>
+      <div class="bg-blue-950 border-2 border-blue-800 p-6 rounded-2xl shadow-2xl space-y-5">
+        <div class="border-b border-blue-800 pb-3 flex justify-between items-center">
+          <h2 class="text-lg font-black text-white uppercase tracking-tight">🏓 Log Match Score</h2>
+          <span class="text-xs font-bold text-red-400 bg-red-950 px-2.5 py-1 rounded-lg border border-red-800">Max 21 Points</span>
+        </div>
+
+        <!-- Date Input -->
+        <div>
+          <label class="text-xs text-blue-300 font-bold block mb-1">Match Date</label>
+          <input type="date" id="matchDate" class="w-full bg-blue-900/60 border border-blue-700 rounded-xl p-3 text-white font-semibold focus:outline-none focus:border-red-500">
+        </div>
+
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-xs text-gray-400 block mb-1">Winner</label>
-            <select id="winnerSelect" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white font-semibold focus:outline-none focus:border-red-500"></select>
+            <label class="text-xs text-blue-300 font-bold block mb-1">Player 1</label>
+            <select id="p1Select" class="w-full bg-blue-900/60 border border-blue-700 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-red-500"></select>
           </div>
           <div>
-            <label class="text-xs text-gray-400 block mb-1">Loser</label>
-            <select id="loserSelect" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white font-semibold focus:outline-none focus:border-red-500"></select>
+            <label class="text-xs text-blue-300 font-bold block mb-1">Player 2</label>
+            <select id="p2Select" class="w-full bg-blue-900/60 border border-blue-700 rounded-xl p-3 text-white font-bold focus:outline-none focus:border-red-500"></select>
           </div>
         </div>
+
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-xs text-gray-400 block mb-1">Winner Score</label>
-            <input type="number" id="winnerScore" value="21" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white font-semibold focus:outline-none focus:border-red-500">
+            <label class="text-xs text-blue-300 font-bold block mb-1">Player 1 Points (Max 21)</label>
+            <input type="number" id="p1Score" min="0" max="21" value="21" oninput="validateScore(this)" class="w-full bg-blue-900/60 border border-blue-700 rounded-xl p-3 text-white font-black text-lg focus:outline-none focus:border-red-500">
           </div>
           <div>
-            <label class="text-xs text-gray-400 block mb-1">Loser Score</label>
-            <input type="number" id="loserScore" placeholder="e.g. 15" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white font-semibold focus:outline-none focus:border-red-500">
+            <label class="text-xs text-blue-300 font-bold block mb-1">Player 2 Points (Max 21)</label>
+            <input type="number" id="p2Score" min="0" max="21" placeholder="e.g. 18" oninput="validateScore(this)" class="w-full bg-blue-900/60 border border-blue-700 rounded-xl p-3 text-white font-black text-lg focus:outline-none focus:border-red-500">
           </div>
         </div>
-        <button onclick="submitMatch()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition">Record Game & Update Ratings</button>
+
+        <button onclick="submitMatch()" class="w-full bg-red-600 hover:bg-red-500 text-white font-black py-4 rounded-xl shadow-lg border border-white uppercase tracking-wider transition">Calculate Swing & Record Result</button>
       </div>
     </div>
 
-    <!-- MATCH HISTORY TAB -->
+    <!-- 3. STATS & HEAD-TO-HEAD TAB -->
+    <div id="view-stats" class="tab-content hidden space-y-6 max-w-2xl mx-auto">
+      <div class="bg-blue-950 border-2 border-blue-800 p-6 rounded-2xl shadow-2xl space-y-4">
+        <h2 class="text-lg font-black text-white uppercase border-b border-blue-800 pb-2">⚔️ Head-to-Head Comparison</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-blue-300 font-bold block mb-1">Select Player A</label>
+            <select id="h2hP1" onchange="renderH2H()" class="w-full bg-blue-900/60 border border-blue-700 rounded-xl p-3 text-white font-bold"></select>
+          </div>
+          <div>
+            <label class="text-xs text-blue-300 font-bold block mb-1">Select Player B</label>
+            <select id="h2hP2" onchange="renderH2H()" class="w-full bg-blue-900/60 border border-blue-700 rounded-xl p-3 text-white font-bold"></select>
+          </div>
+        </div>
+        <div id="h2hResults" class="p-4 bg-blue-900/40 rounded-xl border border-blue-800 text-center space-y-2"></div>
+      </div>
+    </div>
+
+    <!-- 4. MATCH HISTORY TAB -->
     <div id="view-history" class="tab-content hidden max-w-2xl mx-auto">
       <div id="historyList" class="space-y-3"></div>
     </div>
 
-    <!-- LIVE SYNC / SETTINGS TAB -->
+    <!-- 5. LIVE SYNC TAB -->
     <div id="view-settings" class="tab-content hidden max-w-xl mx-auto space-y-6">
-      <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl shadow-xl space-y-4">
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">☁️ Live Shared Database Setup</h2>
-        <p class="text-xs text-gray-400">Paste your Firebase configuration snippet or JSON directly below:</p>
-        <textarea id="configInput" rows="6" placeholder="Paste entire firebaseConfig snippet here..." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs font-mono text-gray-300 focus:outline-none focus:border-red-500"></textarea>
+      <div class="bg-blue-950 border-2 border-blue-800 p-6 rounded-2xl shadow-2xl space-y-4">
+        <h2 class="text-lg font-black text-white uppercase border-b border-blue-800 pb-2">☁️ Live Shared Database Setup</h2>
+        <p class="text-xs text-blue-200">Paste your Firebase configuration snippet or JSON directly below:</p>
+        <textarea id="configInput" rows="6" placeholder="Paste snippet here..." class="w-full bg-slate-950 border border-blue-800 rounded-xl p-3 text-xs font-mono text-gray-300 focus:outline-none focus:border-red-500"></textarea>
         <div class="flex gap-2">
-          <button onclick="saveFirebaseConfig()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-xl text-sm transition">Connect Live Sync</button>
-          <button onclick="useLocalStorage()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold px-4 py-3 rounded-xl text-sm transition">Use Local Storage</button>
+          <button onclick="saveFirebaseConfig()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-extrabold py-3 rounded-xl text-sm transition">Connect Live Sync</button>
+          <button onclick="useLocalStorage()" class="bg-blue-900 hover:bg-blue-800 text-blue-200 font-extrabold px-4 py-3 rounded-xl text-sm transition">Use Local Storage</button>
         </div>
       </div>
-      <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl shadow-xl space-y-4">
-        <h2 class="text-lg font-bold text-white flex items-center gap-2">➕ Add New Player</h2>
+      <div class="bg-blue-950 border-2 border-blue-800 p-6 rounded-2xl shadow-2xl space-y-4">
+        <h2 class="text-lg font-black text-white uppercase border-b border-blue-800 pb-2">➕ Add New Player</h2>
         <div class="flex gap-2">
-          <input type="text" id="newPlayerName" placeholder="Player Name" class="flex-1 bg-gray-800 border border-gray-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-500">
-          <button onclick="addNewPlayer()" class="bg-red-600 hover:bg-red-500 text-white font-bold px-5 py-3 rounded-xl text-sm transition">Add Player</button>
+          <input type="text" id="newPlayerName" placeholder="Player Name" class="flex-1 bg-blue-900/60 border border-blue-700 rounded-xl p-3 text-sm text-white font-bold focus:outline-none focus:border-red-500">
+          <button onclick="addNewPlayer()" class="bg-red-600 hover:bg-red-500 text-white font-extrabold px-5 py-3 rounded-xl text-sm transition">Add Player</button>
         </div>
       </div>
     </div>
+
   </main>
 
   <script>
@@ -123,12 +175,15 @@
     let matches = [];
 
     const defaultPlayers = [
-      { id: '1', name: 'Ankur', pts: 1200, w: 0, l: 0 },
-      { id: '2', name: 'Alok', pts: 1200, w: 0, l: 0 },
-      { id: '3', name: 'Sumit', pts: 1200, w: 0, l: 0 }
+      { id: '1', name: 'Ankur', pts: 1200, w: 0, l: 0, ptsScored: 0, ptsConceded: 0 },
+      { id: '2', name: 'Alok', pts: 1200, w: 0, l: 0, ptsScored: 0, ptsConceded: 0 },
+      { id: '3', name: 'Sumit', pts: 1200, w: 0, l: 0, ptsScored: 0, ptsConceded: 0 }
     ];
 
     window.onload = function() {
+      // Set default date to today
+      document.getElementById('matchDate').valueAsDate = new Date();
+
       const savedConfig = localStorage.getItem('cr_firebase_config');
       if (savedConfig) {
         initFirebase(JSON.parse(savedConfig));
@@ -137,15 +192,22 @@
       }
     };
 
+    function validateScore(input) {
+      if (parseInt(input.value) > 21) input.value = 21;
+      if (parseInt(input.value) < 0) input.value = 0;
+    }
+
     function switchTab(tab) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(el => {
-        el.classList.remove('bg-red-600', 'text-white');
-        el.classList.add('bg-gray-800/60', 'text-gray-400');
+        el.classList.remove('bg-blue-600', 'text-white', 'border-white');
+        el.classList.add('bg-blue-900/60', 'text-blue-200', 'border-blue-700/50');
       });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).classList.add('bg-red-600', 'text-white');
-      document.getElementById(`tab-${tab}`).classList.remove('bg-gray-800/60', 'text-gray-400');
+      document.getElementById(`tab-${tab}`).classList.add('bg-blue-600', 'text-white', 'border-white');
+      document.getElementById(`tab-${tab}`).classList.remove('bg-blue-900/60', 'text-blue-200');
+
+      if (tab === 'stats') renderH2H();
     }
 
     function parseConfig(text) {
@@ -162,10 +224,7 @@
     function saveFirebaseConfig() {
       const raw = document.getElementById('configInput').value.trim();
       const cfg = parseConfig(raw);
-      if (!cfg) {
-        alert("Could not parse config keys. Please make sure the copied snippet contains 'apiKey'.");
-        return;
-      }
+      if (!cfg) { alert("Could not parse config snippet."); return; }
       localStorage.setItem('cr_firebase_config', JSON.stringify(cfg));
       initFirebase(cfg);
     }
@@ -175,8 +234,8 @@
         if (!firebase.apps.length) firebase.initializeApp(cfg);
         db = firebase.firestore();
         document.getElementById('syncStatus').innerHTML = `<span class="w-2 h-2 rounded-full bg-green-400"></span> Live Cloud Sync`;
-        document.getElementById('syncStatus').className = "text-xs font-semibold px-3 py-1.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 flex items-center gap-1.5";
-        
+        document.getElementById('syncStatus').className = "text-xs font-bold px-3 py-1.5 rounded-full bg-green-500/20 text-green-300 border border-green-500 flex items-center gap-2";
+
         db.collection('players').onSnapshot(snap => {
           if (snap.empty) seedDatabase();
           else {
@@ -190,14 +249,13 @@
           renderHistory();
         });
       } catch (err) {
-        console.error(err);
         useLocalStorage();
       }
     }
 
     function useLocalStorage() {
-      document.getElementById('syncStatus').innerHTML = `<span class="w-2 h-2 rounded-full bg-blue-400"></span> Local Storage`;
-      document.getElementById('syncStatus').className = "text-xs font-semibold px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1.5";
+      document.getElementById('syncStatus').innerHTML = `<span class="w-2 h-2 rounded-full bg-blue-400"></span> Local Mode`;
+      document.getElementById('syncStatus').className = "text-xs font-bold px-3 py-1.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500 flex items-center gap-2";
       players = JSON.parse(localStorage.getItem('cr_players')) || defaultPlayers;
       matches = JSON.parse(localStorage.getItem('cr_matches')) || [];
       renderAll();
@@ -219,15 +277,15 @@
       const podium = document.getElementById('topPodium');
       podium.innerHTML = '';
       const top3 = players.slice(0, 3);
+      const medals = ['🥇', '🥈', '🥉'];
       top3.forEach((p, idx) => {
-        const medals = ['🥇', '🥈', '🥉'];
         podium.innerHTML += `
-          <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex items-center gap-4">
+          <div class="bg-blue-950 border-2 border-blue-800 p-4 rounded-2xl flex items-center gap-4 shadow-xl">
             <span class="text-3xl">${medals[idx] || '🏅'}</span>
             <div>
-              <div class="text-xs text-gray-400">Rank #${idx + 1}</div>
-              <div class="font-bold text-white text-base">${p.name}</div>
-              <div class="text-xs font-semibold text-red-400">${p.pts} pts</div>
+              <div class="text-xs text-blue-300 font-bold">Rank #${idx + 1}</div>
+              <div class="font-extrabold text-white text-base">${p.name}</div>
+              <div class="text-xs font-black text-red-400">${p.pts} Rating</div>
             </div>
           </div>
         `;
@@ -238,94 +296,89 @@
       const tbody = document.getElementById('leaderboardBody');
       tbody.innerHTML = '';
       players.forEach((p, idx) => {
-        const total = p.w + p.l;
-        const winPct = total > 0 ? Math.round((p.w / total) * 100) : 0;
         tbody.innerHTML += `
-          <tr class="hover:bg-gray-800/30 transition">
-            <td class="p-4 font-bold text-gray-400">#${idx + 1}</td>
-            <td class="p-4 font-bold text-white">${p.name}</td>
-            <td class="p-4 text-center font-extrabold text-red-400">${p.pts}</td>
-            <td class="p-4 text-center text-gray-300">${p.w} - ${p.l}</td>
-            <td class="p-4 text-center text-gray-400">${winPct}%</td>
+          <tr class="hover:bg-blue-900/30 transition">
+            <td class="p-4 font-black text-blue-300">#${idx + 1}</td>
+            <td class="p-4 font-extrabold text-white">${p.name}</td>
+            <td class="p-4 text-center font-black text-red-400 text-base">${p.pts}</td>
+            <td class="p-4 text-center text-blue-200">${p.w || 0} - ${p.l || 0}</td>
+            <td class="p-4 text-center text-gray-300">${p.ptsScored || 0} / ${p.ptsConceded || 0}</td>
           </tr>
         `;
       });
     }
 
     function updateDropdowns() {
-      const wSel = document.getElementById('winnerSelect');
-      const lSel = document.getElementById('loserSelect');
-      wSel.innerHTML = '';
-      lSel.innerHTML = '';
+      const p1 = document.getElementById('p1Select');
+      const p2 = document.getElementById('p2Select');
+      const h1 = document.getElementById('h2hP1');
+      const h2 = document.getElementById('h2hP2');
+
+      [p1, p2, h1, h2].forEach(sel => sel.innerHTML = '');
+
       players.forEach(p => {
-        wSel.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-        lSel.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+        const opt = `<option value="${p.id}">${p.name} (${p.pts})</option>`;
+        p1.innerHTML += opt;
+        p2.innerHTML += opt;
+        h1.innerHTML += opt;
+        h2.innerHTML += opt;
       });
-      if (players.length > 1) lSel.selectedIndex = 1;
-    }
 
-    function renderHistory() {
-      const hList = document.getElementById('historyList');
-      hList.innerHTML = matches.length === 0 ? '<p class="text-center text-gray-500 text-sm py-8">No matches recorded yet.</p>' : '';
-      matches.forEach(m => {
-        hList.innerHTML += `
-          <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl flex justify-between items-center text-sm">
-            <div>
-              <span class="font-bold text-green-400">${m.winnerName}</span>
-              <span class="text-gray-400 font-bold mx-1.5">${m.winnerScore} - ${m.loserScore}</span>
-              <span class="text-gray-400">${m.loserName}</span>
-            </div>
-            <span class="text-xs text-gray-500">${new Date(m.date).toLocaleDateString()}</span>
-          </div>
-        `;
-      });
-    }
-
-    function addNewPlayer() {
-      const name = document.getElementById('newPlayerName').value.trim();
-      if (!name) return;
-      const newP = { id: Date.now().toString(), name: name, pts: 1200, w: 0, l: 0 };
-      if (db) db.collection('players').doc(newP.id).set(newP);
-      else {
-        players.push(newP);
-        localStorage.setItem('cr_players', JSON.stringify(players));
-        renderAll();
+      if (players.length > 1) {
+        p2.selectedIndex = 1;
+        h2.selectedIndex = 1;
       }
-      document.getElementById('newPlayerName').value = '';
     }
 
     function submitMatch() {
-      const wId = document.getElementById('winnerSelect').value;
-      const lId = document.getElementById('loserSelect').value;
-      const wScore = parseInt(document.getElementById('winnerScore').value);
-      const lScore = parseInt(document.getElementById('loserScore').value);
+      const p1Id = document.getElementById('p1Select').value;
+      const p2Id = document.getElementById('p2Select').value;
+      let s1 = parseInt(document.getElementById('p1Score').value) || 0;
+      let s2 = parseInt(document.getElementById('p2Score').value) || 0;
+      const matchDate = document.getElementById('matchDate').value;
 
-      if (wId === lId) { alert("Winner and Loser cannot be the same!"); return; }
+      if (p1Id === p2Id) { alert("Please select two different players!"); return; }
+      if (s1 > 21) s1 = 21;
+      if (s2 > 21) s2 = 21;
+      if (s1 === 0 && s2 === 0) { alert("Scores cannot both be zero."); return; }
 
-      const winner = players.find(p => p.id === wId);
-      const loser = players.find(p => p.id === lId);
+      const p1 = players.find(p => p.id === p1Id);
+      const p2 = players.find(p => p.id === p2Id);
 
-      // Elo Rating Calculation
+      // --- POINT-SHARE EXPECTATION RATING ALGORITHM ---
+      const totalPoints = s1 + s2;
+      const actualShare1 = s1 / totalPoints;
+      const actualShare2 = s2 / totalPoints;
+
+      // Expected share based on rating diff
+      const expShare1 = 1 / (1 + Math.pow(10, (p2.pts - p1.pts) / 400));
+      const expShare2 = 1 - expShare1;
+
       const K = 32;
-      const expectedW = 1 / (1 + Math.pow(10, (loser.pts - winner.pts) / 400));
-      const expectedL = 1 / (1 + Math.pow(10, (winner.pts - loser.pts) / 400));
-      
-      winner.pts = Math.round(winner.pts + K * (1 - expectedW));
-      loser.pts = Math.round(loser.pts + K * (0 - expectedL));
-      winner.w += 1;
-      loser.l += 1;
+      const change1 = Math.round(K * (actualShare1 - expShare1));
+      const change2 = Math.round(K * (actualShare2 - expShare2));
+
+      p1.pts += change1;
+      p2.pts += change2;
+
+      if (s1 > s2) { p1.w = (p1.w || 0) + 1; p2.l = (p2.l || 0) + 1; }
+      else if (s2 > s1) { p2.w = (p2.w || 0) + 1; p1.l = (p1.l || 0) + 1; }
+
+      p1.ptsScored = (p1.ptsScored || 0) + s1;
+      p1.ptsConceded = (p1.ptsConceded || 0) + s2;
+      p2.ptsScored = (p2.ptsScored || 0) + s2;
+      p2.ptsConceded = (p2.ptsConceded || 0) + s1;
 
       const matchObj = {
-        winnerName: winner.name,
-        loserName: loser.name,
-        winnerScore: wScore,
-        loserScore: lScore,
-        date: new Date().toISOString()
+        p1Name: p1.name, p2Name: p2.name,
+        p1Score: s1, p2Score: s2,
+        p1Change: change1, p2Change: change2,
+        date: matchDate || new Date().toISOString().split('T')[0]
       };
 
       if (db) {
-        db.collection('players').doc(winner.id).update({ pts: winner.pts, w: winner.w });
-        db.collection('players').doc(loser.id).update({ pts: loser.pts, l: loser.l });
+        db.collection('players').doc(p1.id).update(p1);
+        db.collection('players').doc(p2.id).update(p2);
         db.collection('matches').add(matchObj);
       } else {
         matches.unshift(matchObj);
@@ -334,7 +387,80 @@
         renderAll();
         renderHistory();
       }
+
       switchTab('leaderboard');
+    }
+
+    function renderH2H() {
+      const id1 = document.getElementById('h2hP1').value;
+      const id2 = document.getElementById('h2hP2').value;
+      const p1 = players.find(p => p.id === id1);
+      const p2 = players.find(p => p.id === id2);
+      const container = document.getElementById('h2hResults');
+
+      if (!p1 || !p2 || id1 === id2) {
+        container.innerHTML = '<p class="text-xs text-blue-300">Select two different players to view Head-to-Head stats.</p>';
+        return;
+      }
+
+      let p1Wins = 0, p2Wins = 0, p1TotalPts = 0, p2TotalPts = 0;
+      matches.forEach(m => {
+        if ((m.p1Name === p1.name && m.p2Name === p2.name)) {
+          p1TotalPts += m.p1Score; p2TotalPts += m.p2Score;
+          if (m.p1Score > m.p2Score) p1Wins++; else if (m.p2Score > m.p1Score) p2Wins++;
+        } else if ((m.p1Name === p2.name && m.p2Name === p1.name)) {
+          p2TotalPts += m.p1Score; p1TotalPts += m.p2Score;
+          if (m.p1Score > m.p2Score) p2Wins++; else if (m.p2Score > m.p1Score) p1Wins++;
+        }
+      });
+
+      container.innerHTML = `
+        <div class="grid grid-cols-3 items-center text-sm font-bold">
+          <div class="text-left text-blue-200">${p1.name}</div>
+          <div class="text-xs uppercase text-blue-400">Head to Head</div>
+          <div class="text-right text-blue-200">${p2.name}</div>
+
+          <div class="text-2xl font-black text-red-400 text-left">${p1Wins}</div>
+          <div class="text-xs text-gray-400">Wins</div>
+          <div class="text-2xl font-black text-red-400 text-right">${p2Wins}</div>
+
+          <div class="text-lg font-extrabold text-white text-left">${p1TotalPts}</div>
+          <div class="text-xs text-gray-400">Total Points</div>
+          <div class="text-lg font-extrabold text-white text-right">${p2TotalPts}</div>
+        </div>
+      `;
+    }
+
+    function renderHistory() {
+      const hList = document.getElementById('historyList');
+      hList.innerHTML = matches.length === 0 ? '<p class="text-center text-blue-300 text-sm py-8">No matches recorded yet.</p>' : '';
+      matches.forEach(m => {
+        const c1 = m.p1Change >= 0 ? `+${m.p1Change}` : `${m.p1Change}`;
+        const c2 = m.p2Change >= 0 ? `+${m.p2Change}` : `${m.p2Change}`;
+        hList.innerHTML += `
+          <div class="bg-blue-950 border border-blue-800 p-4 rounded-xl flex justify-between items-center text-sm">
+            <div>
+              <span class="font-black text-white">${m.p1Name || m.winnerName} (${c1})</span>
+              <span class="text-red-400 font-black mx-2">${m.p1Score ?? m.winnerScore} - ${m.p2Score ?? m.loserScore}</span>
+              <span class="font-black text-white">${m.p2Name || m.loserName} (${c2})</span>
+            </div>
+            <span class="text-xs text-blue-300 font-bold">${m.date || ''}</span>
+          </div>
+        `;
+      });
+    }
+
+    function addNewPlayer() {
+      const name = document.getElementById('newPlayerName').value.trim();
+      if (!name) return;
+      const newP = { id: Date.now().toString(), name: name, pts: 1200, w: 0, l: 0, ptsScored: 0, ptsConceded: 0 };
+      if (db) db.collection('players').doc(newP.id).set(newP);
+      else {
+        players.push(newP);
+        localStorage.setItem('cr_players', JSON.stringify(players));
+        renderAll();
+      }
+      document.getElementById('newPlayerName').value = '';
     }
   </script>
 </body>
